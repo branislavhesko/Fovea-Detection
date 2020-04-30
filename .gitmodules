@@ -1,0 +1,6 @@
+[submodule "segmentation_framework"]
+	path = segmentation_framework
+	url = git@github.com:branislavhesko/segmentation_framework.git
+[submodule "deep_classifier"]
+	path = deep_classifier
+	url = git@github.com:branislavhesko/deep_classifier.git
