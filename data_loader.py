@@ -45,8 +45,12 @@ class FoveaLoader(Dataset):
                                      int(self._fovea_gt["Fovea_Y"].iloc[item])
         img = cv2.cvtColor(cv2.imread(list(filter(
             lambda x: img_name in x, self._images))[0], cv2.IMREAD_COLOR), cv2.COLOR_BGR2RGB) / 255.
-        fovea_gt = self.make_mask(img.shape[:2], 21, (fovea_y, fovea_x))
-        return img, fovea_gt
+        scale_x, scale_y = img.shape[1] / self._config.shape[1], img.shape[0] / self._config.shape[0]
+        fovea_x = fovea_x / scale_x
+        fovea_y = fovea_y / scale_y
+        img = cv2.resize(img, (512, 512))
+        fovea_gt = self.make_mask(img.shape[:2], 21, (int(fovea_y), int(fovea_x)))
+        return torch.from_numpy(img).permute([2, 0, 1]).float(), torch.from_numpy(fovea_gt)
 
     @staticmethod
     def make_mask(mask_size, kernel_size, point):
@@ -69,6 +73,9 @@ def get_data_loader(config):
 
 if __name__ == "__main__":
     from collections import namedtuple
-    X = namedtuple("X", ["path"])
-    dataset = FoveaLoader(X(path="./data/"))
-    print(dataset[0])
+    from matplotlib import pyplot as plt
+    X = namedtuple("X", ["path", "shape"])
+    dataset = FoveaLoader(X(path="./data/", shape=(512, 512)))
+    for img, data in dataset:
+        plt.imshow(data.numpy())
+        plt.show()
