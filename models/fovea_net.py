@@ -1,5 +1,5 @@
 import torch
-from torch.nn import Conv2d, ConvTranspose2d, BatchNorm2d, ReLU, Sequential
+from torch.nn import Conv2d, ConvTranspose2d, BatchNorm2d, ReLU, Sequential, Sigmoid
 
 
 class FoveaNet(torch.nn.Module):
@@ -25,7 +25,8 @@ class FoveaNet(torch.nn.Module):
         dec_4 = self.decoder4(torch.cat([self.central_part(layer4_out), layer3_out], dim=1))
         dec_3 = self.decoder3(torch.cat([layer2_out, dec_4], dim=1))
         dec_2 = self.decoder2(torch.cat([layer1_out, dec_3], dim=1))
-        return self.final_part(torch.cat([enc1, dec_2], dim=1))
+        final = self.final_part(torch.cat([enc1, dec_2], dim=1))
+        return torch.clamp(final.sigmoid_(), min=1e-4, max=1 - 1e-4)
 
 
 class _DecoderBlock(torch.nn.Module):
@@ -59,8 +60,7 @@ class _FinalBlock(torch.nn.Module):
             ReLU(inplace=True),
             Conv2d(in_channels, in_channels, kernel_size=3, padding=1),
             BatchNorm2d(in_channels),
-            ReLU(inplace=True),
-            Conv2d(in_channels, out_channels, kernel_size=1)
+            Conv2d(in_channels, out_channels, kernel_size=1),
         ])
 
     def forward(self, x):

@@ -3,6 +3,7 @@ logging.basicConfig(format='%(levelname)s: [%(asctime)s] [%(name)s:%(lineno)d-%(
                     level=logging.INFO, datefmt='%d/%m/%Y %I:%M:%S')
 from time import sleep
 
+import cv2
 from matplotlib import pyplot as plt
 import numpy as np
 import torch
@@ -36,21 +37,34 @@ class Trainer:
         pass
 
     def _train_single_epoch(self, epoch):
+        ln = None
         for idx, data in enumerate(self._data_loader[DataMode.train]):
+            self._optimizer.zero_grad()
             img, labels = [d.cuda() for d in data]
             outputs = self._model(img)
             loss = self._loss(labels, outputs)
             self._logger.info("Actual loss: {}.".format(loss.item()))
             loss.backward()
             self._optimizer.step()
-            plt.subplot(1, 2, 1)
-            plt.imshow(outputs[0, 0, :, :].detach().cpu().numpy(), vmin=0, vmax=1)
-            plt.subplot(1, 2, 2)
-            plt.imshow(labels[0, 0, :, :].detach().cpu().numpy())
+            plt.clf()
+            if ln is not None:
+                for l in ln:
+                    l.remove()
+            out = outputs[0, 0, :, :].detach().cpu().numpy()
+            plt.subplot(1, 3, 1)
+            plt.imshow(cv2.resize(img.detach().permute([0, 2, 3, 1]).cpu().numpy()[0, :, :, :], out.shape))
+            plt.subplot(1, 3, 2)
+            plt.imshow(out, vmin=0, vmax=1)
+            ln = plt.plot(*np.unravel_index(np.argmax(out, axis=None), shape=out.shape)[::-1], "+r", markersize=15)
+            self._logger.info(f"OUT_LOC: {np.unravel_index(np.argmax(out, axis=None), shape=out.shape)[::-1]}")
+            plt.subplot(1, 3, 3)
+            lab = labels[0, 0, :, :].detach().cpu().numpy()
+            plt.imshow(lab)
+            plt.plot(np.amax(np.argmax(lab, axis=1)), np.amax(np.argmax(lab, axis=0)), "+r", markersize=15)
+            self._logger.info(f"GT_LOC: {(np.amax(np.argmax(lab, axis=1)), np.amax(np.argmax(lab, axis=0)))}")
+
             plt.draw()
-            plt.pause(0.001)
-
-
+            plt.pause(0.1)
 
 
 if __name__ == "__main__":

@@ -1,3 +1,5 @@
+import logging
+
 import torch
 
 
@@ -7,12 +9,13 @@ class FocalLoss(torch.nn.Module):
         super().__init__()
         self._alfa = alfa
         self._beta = beta
+        self._logger = logging.getLogger(self.__class__.__name__)
 
     def forward(self, labels, output):
         loss_point = torch.sum((1 - output[
-            labels == 1.]) ** self._alfa * torch.nn.functional.logsigmoid(output[labels == 1.]))
-        loss_background = torch.mean((1 - labels[labels != 1]) ** self._beta * output[
-            labels != 1.] ** self._alfa * torch.nn.functional.logsigmoid(1 - output[labels != 1.]))
+            labels == 1.]) ** self._alfa * torch.log(output[labels == 1.]))
+        loss_background = torch.mean((1 - labels) ** self._beta * output ** self._alfa * torch.log(1 - output))
+        self._logger.info("Losses: point: {}, background: {}.".format(loss_point.item(), loss_background.item()))
         return -1 * (loss_point + loss_background)
 
 
