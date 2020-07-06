@@ -8,6 +8,8 @@ import torch
 from torch.utils.data.dataset import Dataset
 from torch.utils.data.dataloader import DataLoader
 
+from config import DataMode
+
 
 class FoveaLoader(Dataset):
 
@@ -48,9 +50,11 @@ class FoveaLoader(Dataset):
         scale_x, scale_y = img.shape[1] / self._config.shape[1], img.shape[0] / self._config.shape[0]
         fovea_x = fovea_x / scale_x
         fovea_y = fovea_y / scale_y
-        img = cv2.resize(img, (512, 512))
-        fovea_gt = self.make_mask(img.shape[:2], 21, (int(fovea_y), int(fovea_x)))
-        return torch.from_numpy(img).permute([2, 0, 1]).float(), torch.from_numpy(fovea_gt)
+        img = cv2.resize(img, (self._config.shape[0], self._config.shape[1]))
+        fovea_gt = self.make_mask(np.array(img.shape[:2]) // self._config.output_stride, 21,
+                                  (int(fovea_y // self._config.output_stride),
+                                   int(fovea_x // self._config.output_stride)))
+        return torch.from_numpy(img).permute([2, 0, 1]).float(), torch.from_numpy(fovea_gt).unsqueeze(0)
 
     @staticmethod
     def make_mask(mask_size, kernel_size, point):
@@ -67,8 +71,8 @@ class FoveaLoader(Dataset):
 def get_data_loader(config):
     dataset = FoveaLoader(config)
     # TODO: finish
-    data_loader = DataLoader(dataset)
-    return data_loader
+    data_loader = DataLoader(dataset, batch_size=2)
+    return {DataMode.train: data_loader, DataMode.eval: data_loader}
 
 
 if __name__ == "__main__":
