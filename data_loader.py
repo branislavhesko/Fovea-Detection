@@ -51,7 +51,7 @@ class FoveaLoader(Dataset):
         fovea_x = fovea_x / scale_x
         fovea_y = fovea_y / scale_y
         img = cv2.resize(img, (self._config.shape[0], self._config.shape[1]))
-        fovea_gt = self.make_mask(np.array(img.shape[:2]) // self._config.output_stride, 11,
+        fovea_gt = self.make_mask(np.array(img.shape[:2]) // self._config.output_stride, self._config.kernel_size,
                                   (int(fovea_y // self._config.output_stride),
                                    int(fovea_x // self._config.output_stride)))
         return torch.from_numpy(img).permute([2, 0, 1]).float(), torch.from_numpy(fovea_gt).unsqueeze(0)
@@ -71,7 +71,7 @@ class FoveaLoader(Dataset):
 def get_data_loader(config):
     dataset = FoveaLoader(config)
     # TODO: finish
-    data_loader = DataLoader(dataset, batch_size=2, shuffle=True)
+    data_loader = DataLoader(dataset, batch_size=config.batch_size, shuffle=config.shuffle)
     return {DataMode.train: data_loader, DataMode.eval: data_loader}
 
 

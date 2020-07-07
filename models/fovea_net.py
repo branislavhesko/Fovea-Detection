@@ -1,5 +1,5 @@
 import torch
-from torch.nn import Conv2d, ConvTranspose2d, BatchNorm2d, ReLU, Sequential, Sigmoid
+from torch.nn import Conv2d, ConvTranspose2d, BatchNorm2d, ReLU, Sequential
 
 
 class FoveaNet(torch.nn.Module):

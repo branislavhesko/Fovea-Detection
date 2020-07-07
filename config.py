@@ -15,5 +15,13 @@ class Config:
     alfa = 2.
     beta = 4.
     path = "/home/brani/STORAGE/DATA/refugee/"
-    shape = (256, 256)
+    shape = (512, 512)
     output_stride = 2
+    visualization_frequency = {
+        DataMode.train: 50,
+        DataMode.eval: 10
+    }
+    device = "cuda:0"
+    kernel_size = 5
+    shuffle = True
+    batch_size = 2
