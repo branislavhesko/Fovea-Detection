@@ -1,5 +1,7 @@
 from enum import auto, Enum
 
+from utils.post_processing import max_postprocess
+
 
 class DataMode(Enum):
     train = auto()
@@ -25,3 +27,4 @@ class Config:
     kernel_size = 5
     shuffle = True
     batch_size = 2
+    post_processing_fn = max_postprocess
