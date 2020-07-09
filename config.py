@@ -1,6 +1,6 @@
 from enum import auto, Enum
 
-from utils.post_processing import max_postprocess
+from utils.post_processing import max_postprocess, center_of_gravity_postprocess
 
 
 class DataMode(Enum):
@@ -27,4 +27,5 @@ class Config:
     kernel_size = 5
     shuffle = True
     batch_size = 2
-    post_processing_fn = max_postprocess
+    post_processing_fn = center_of_gravity_postprocess
+    limit_size = 0.8
