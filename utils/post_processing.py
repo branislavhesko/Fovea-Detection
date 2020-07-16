@@ -11,7 +11,7 @@ def center_of_gravity_postprocess(output, config):
     y, x = np.meshgrid(np.arange(output.shape[0]), np.arange(output.shape[1]))
     detected_object = (output > maximum) & (np.abs(x - maximum_loc[0]) < config.kernel_size) & \
                       (np.abs(y - maximum_loc[1]) < config.kernel_size)
-    output[detected_object == False] = 0
+    output[detected_object is False] = 0
     center_x = np.sum(x[detected_object] * output[detected_object]) / np.sum(output[detected_object])
     center_y = np.sum(y[detected_object] * output[detected_object]) / np.sum(output[detected_object])
     return center_x, center_y
