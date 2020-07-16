@@ -13,8 +13,9 @@ from config import DataMode
 
 class FoveaLoader(Dataset):
 
-    def __init__(self, config):
+    def __init__(self, config, mode=DataMode.eval):
         super().__init__()
+        self._mode = mode
         self._config = config
         self._fovea_gt = {}
         self._images = []
@@ -22,7 +23,7 @@ class FoveaLoader(Dataset):
         self._load_images(config.path)
 
     def _load_annotations(self, path):
-        xlss = glob.glob(osp.join(path, "fovea", "*.xlsx"))
+        xlss = glob.glob(osp.join(path, "fovea_" + self._mode.name, "*.xlsx"))
         for xls in xlss:
             data = pd.read_excel(xls)
             if "ImgName" in self._fovea_gt:
@@ -38,8 +39,7 @@ class FoveaLoader(Dataset):
         self._images = glob.glob(osp.join(path, "images", "*.jpg"))
 
     def __len__(self):
-        assert len(self._images) == self._fovea_gt["ImgName"].shape[0]
-        return len(self._images)
+        return self._fovea_gt["ImgName"].shape[0]
 
     def __getitem__(self, item):
         img_name, fovea_x, fovea_y = self._fovea_gt["ImgName"].iloc[item], \
@@ -68,10 +68,10 @@ class FoveaLoader(Dataset):
         return mask.astype(np.float32)
 
 
-def get_data_loader(config):
-    dataset = FoveaLoader(config)
+def get_data_loader(config, mode):
+    dataset = FoveaLoader(config, mode)
     # TODO: finish
-    data_loader = DataLoader(dataset, batch_size=config.batch_size, shuffle=config.shuffle)
+    data_loader = DataLoader(dataset, batch_size=config.batch_size, shuffle=config.shuffle[mode])
     return {DataMode.train: data_loader, DataMode.eval: data_loader}
 
 

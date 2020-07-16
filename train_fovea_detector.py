@@ -23,7 +23,7 @@ class Trainer:
         self._optimizer = torch.optim.Adam(params=self._model.parameters(), lr=1e-4)
         self._logger = logging.getLogger(self.__class__.__name__)
         self._visualizer = SummaryWriter()
-        self._data_loader = get_data_loader(config)
+        self._data_loader = get_data_loader(config, mode=DataMode.train)
         self._loss = TotalLoss(config)
         self._precision_meter = {
             DataMode.train: PrecisionMeter(postprocess_fn=self._config.post_processing_fn, config=config),
