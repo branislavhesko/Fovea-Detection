@@ -7,10 +7,11 @@ class FoveaNet(torch.nn.Module):
     def __init__(self, num_classes):
         super().__init__()
         self.backbone = torch.hub.load('zhanghang1989/ResNeSt', 'resnest50', pretrained=True)
-        self.decoder4 = _DecoderBlock(*(1024 + 1024, 1024, 512))
-        self.decoder3 = _DecoderBlock(*(1024, 768, 512))
-        self.decoder2 = _DecoderBlock(*(256 + 512, 384, 256))
-        self.central_part = _CentralPart(2048, 1024)
+        self.backbone.fc = None
+        self.decoder4 = _DecoderBlock(*(1024 + 512, 512, 512))
+        self.decoder3 = _DecoderBlock(*(1024, 512, 512))
+        self.decoder2 = _DecoderBlock(*(256 + 512, 256, 256))
+        self.central_part = _CentralPart(2048, 512)
         self.final_part = _FinalBlock(64 + 256, num_classes)
 
     def forward(self, input_):
@@ -70,15 +71,14 @@ class _FinalBlock(torch.nn.Module):
 class _CentralPart(torch.nn.Module):
     def __init__(self, in_channels, out_channels):
         super().__init__()
-        middle_channels = out_channels + (in_channels - out_channels) // 2
         self.central_part = Sequential(*[
-            Conv2d(in_channels, middle_channels, kernel_size=3, padding=1),
-            BatchNorm2d(middle_channels),
+            Conv2d(in_channels, out_channels, kernel_size=3, padding=1),
+            BatchNorm2d(out_channels),
             ReLU(inplace=True),
-            Conv2d(middle_channels, middle_channels, kernel_size=3, padding=1),
-            BatchNorm2d(middle_channels),
+            Conv2d(out_channels, out_channels, kernel_size=3, padding=1),
+            BatchNorm2d(out_channels),
             ReLU(inplace=True),
-            ConvTranspose2d(middle_channels, out_channels, kernel_size=2, stride=2)
+            ConvTranspose2d(out_channels, out_channels, kernel_size=2, stride=2)
         ])
 
     def forward(self, x):

@@ -71,8 +71,8 @@ class FoveaLoader(Dataset):
 def get_data_loader(config, mode):
     dataset = FoveaLoader(config, mode)
     # TODO: finish
-    data_loader = DataLoader(dataset, batch_size=config.batch_size, shuffle=config.shuffle[mode])
-    return {DataMode.train: data_loader, DataMode.eval: data_loader}
+    data_loader = DataLoader(dataset, batch_size=config.batch_size, shuffle=config.shuffle[mode], num_workers=8)
+    return data_loader
 
 
 if __name__ == "__main__":
