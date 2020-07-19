@@ -24,8 +24,8 @@ class Trainer:
         self._optimizer = torch.optim.Adam(params=self._model.parameters(), lr=1e-4)
         self._logger = logging.getLogger(self.__class__.__name__)
         self._visualizer = SummaryWriter()
-        self._data_loader_train = get_data_loader(config, mode=DataMode.train)
-        self._data_loader_eval = get_data_loader(config, mode=DataMode.eval)
+        self._data_loader = {DataMode.train: get_data_loader(config, mode=DataMode.train),
+                             DataMode.eval: get_data_loader(config, mode=DataMode.eval)}
         self._loss = TotalLoss(config)
         self._precision_meter = {
             DataMode.train: PrecisionMeter(postprocess_fn=self._config.post_processing_fn, config=config),
@@ -42,7 +42,7 @@ class Trainer:
     @torch.no_grad()
     def validate(self, epoch):
         self._precision_meter[DataMode.eval].reset()
-        t = tqdm(self._data_loader_eval[DataMode.eval])
+        t = tqdm(self._data_loader[DataMode.eval])
 
         for idx, data in enumerate(t):
             img, labels = [d.to(self._config.device) for d in data]
@@ -51,11 +51,11 @@ class Trainer:
             t.set_description(f"Actual validation loss: {loss.item():.4f}.")
             self._precision_meter[DataMode.eval].update(labels.detach().cpu().numpy(), outputs.detach().cpu().numpy())
             self._visualizer.add_scalar("eval/TotalLoss", loss.item(),
-                                        epoch * len(self._data_loader_eval[DataMode.eval]) + idx)
+                                        epoch * len(self._data_loader[DataMode.eval]) + idx)
             self._visualizer.add_scalar(f"eval/precision_y", self._precision_meter[DataMode.eval].last_precision[1],
-                                        epoch * len(self._data_loader_eval[DataMode.eval]) + idx)
+                                        epoch * len(self._data_loader[DataMode.eval]) + idx)
             self._visualizer.add_scalar(f"eval/precision_x", self._precision_meter[DataMode.eval].last_precision[0],
-                                        epoch * len(self._data_loader_eval[DataMode.eval]) + idx)
+                                        epoch * len(self._data_loader[DataMode.eval]) + idx)
             if idx % self._config.visualization_frequency[DataMode.eval] == 0:
                 for batch_idx in range(img.shape[0]):
                     fig = self._get_progress_plot(img, labels, outputs, batch_idx=batch_idx)
@@ -64,7 +64,7 @@ class Trainer:
 
     def _train_single_epoch(self, epoch):
         self._precision_meter[DataMode.train].reset()
-        t = tqdm(self._data_loader_train[DataMode.train])
+        t = tqdm(self._data_loader[DataMode.train])
         for idx, data in enumerate(t):
             self._optimizer.zero_grad()
             img, labels = [d.to(self._config.device) for d in data]
@@ -73,13 +73,13 @@ class Trainer:
             t.set_description(f"Actual training loss: {loss.item():.4f}.")
             loss.backward()
             self._visualizer.add_scalar("train/TotalLoss", loss.item(),
-                                        epoch * len(self._data_loader_train[DataMode.train]) + idx)
+                                        epoch * len(self._data_loader[DataMode.train]) + idx)
             self._optimizer.step()
             self._precision_meter[DataMode.train].update(labels.detach().cpu().numpy(), outputs.detach().cpu().numpy())
             self._visualizer.add_scalar(f"train/precision_x", self._precision_meter[DataMode.train].last_precision[0],
-                                        epoch * len(self._data_loader_train[DataMode.train]) + idx)
+                                        epoch * len(self._data_loader[DataMode.train]) + idx)
             self._visualizer.add_scalar(f"train/precision_y", self._precision_meter[DataMode.train].last_precision[1],
-                                        epoch * len(self._data_loader_train[DataMode.train]) + idx)
+                                        epoch * len(self._data_loader[DataMode.train]) + idx)
             if idx % self._config.visualization_frequency[DataMode.train] == 0:
                 for batch_idx in range(img.shape[0]):
                     fig = self._get_progress_plot(img, labels, outputs, batch_idx=batch_idx)
