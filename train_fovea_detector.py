@@ -105,7 +105,7 @@ class Trainer:
 
     def _save_checkpoint(self, path, epoch, include_optimizer=True):
         self._check_and_mkdir(path)
-        path = os.path.join(path, f"{epoch}.ckpt")
+        path = os.path.join(path, f"{self._precision_meter[DataMode.eval].precision:.2f}_{epoch}.ckpt")
         state_dict = {
             "model": self._model.state_dict(),
         }
