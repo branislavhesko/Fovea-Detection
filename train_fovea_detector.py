@@ -31,6 +31,7 @@ class Trainer:
             DataMode.train: PrecisionMeter(postprocess_fn=self._config.post_processing_fn, config=config),
             DataMode.eval: PrecisionMeter(postprocess_fn=self._config.post_processing_fn, config=config)
         }
+        self._load_checkpoint(os.path.join(self._config.path_to_checkpoints, self._config.checkpoint_name))
 
     def train(self):
         for epoch in range(self._config.num_epochs):
@@ -89,7 +90,7 @@ class Trainer:
     @staticmethod
     def _get_progress_plot(img, labels, outputs, batch_idx):
         output_numpy = outputs[batch_idx, 0, :, :].detach().cpu().numpy()
-        fig = plt.figure(1, dpi=200, figsize=(6, 2))
+        fig = plt.figure(1, dpi=100, figsize=(6, 2))
         plt.subplot(1, 3, 1)
         plt.imshow(cv2.resize(img.detach().permute([0, 2, 3, 1]).cpu().numpy()[batch_idx, :, :, :], output_numpy.shape))
         plt.subplot(1, 3, 2)
@@ -118,6 +119,7 @@ class Trainer:
         self._model.load_state_dict(state_dict["model"])
         if "optimizer" in state_dict:
             self._optimizer.load_state_dict(state_dict["optimizer"])
+        print("Checkpoint loaded!")
 
     @staticmethod
     def _check_and_mkdir(path):
