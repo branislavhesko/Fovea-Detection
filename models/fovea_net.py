@@ -8,10 +8,10 @@ class FoveaNet(torch.nn.Module):
         super().__init__()
         self.backbone = torch.hub.load('zhanghang1989/ResNeSt', 'resnest50', pretrained=True)
         self.backbone.fc = None
-        self.decoder4 = _DecoderBlock(*(1024 + 256, 256, 256))
-        self.decoder3 = _DecoderBlock(*(768, 256, 256))
-        self.decoder2 = _DecoderBlock(*(512, 256, 256))
-        self.central_part = _CentralPart(2048, 256)
+        self.decoder4 = _DecoderBlock(*(1024 + 512, 512, 512))
+        self.decoder3 = _DecoderBlock(*(1024, 512, 512))
+        self.decoder2 = _DecoderBlock(*(256 + 512, 256, 256))
+        self.central_part = _CentralPart(2048, 512)
         self.final_part = _FinalBlock(64 + 256, num_classes)
 
     def forward(self, input_):

@@ -31,6 +31,30 @@ class Rotate:
         return image, rotated_points
 
 
+class VerticalFlip:
+
+    def __init__(self, probability):
+        self._probability = probability
+
+    def __call__(self, image, points):
+        if np.random.rand(1) > self._probability:
+            return image, points
+        shape = image.shape[:2]
+        return np.copy(image[::-1, :, :]), [(shape[1] - point[1], point[0]) for point in points]
+
+
+class HorizontalFlip:
+
+    def __init__(self, probability):
+        self._probability = probability
+
+    def __call__(self, image, points):
+        if np.random.rand(1) > self._probability:
+            return image, points
+        shape = image.shape[:2]
+        return np.copy(image[:, ::-1, :]), [(point[1], shape[0] - point[0]) for point in points]
+
+
 class Scale:
 
     def __init__(self, interval):

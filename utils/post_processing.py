@@ -9,7 +9,6 @@ def max_postprocess(output, _):
 def center_of_gravity_postprocess(output, config):
     output[:100, :] = 0
     output[250:] = 0
-    output = cv2.blur(output, ksize=(7, 7))
     maximum = np.amax(output) * config.limit_size
     maximum_loc = np.unravel_index(np.argmax(output, axis=None), shape=output.shape)
     y, x = np.meshgrid(np.arange(output.shape[0]), np.arange(output.shape[1]))
