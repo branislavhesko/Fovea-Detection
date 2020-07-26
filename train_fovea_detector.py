@@ -115,11 +115,12 @@ class Trainer:
         torch.save(state_dict, path)
 
     def _load_checkpoint(self, path):
-        state_dict = torch.load(path)
-        self._model.load_state_dict(state_dict["model"])
-        if "optimizer" in state_dict:
-            self._optimizer.load_state_dict(state_dict["optimizer"])
-        print("Checkpoint loaded!")
+        if self._config.checkpoint_name:
+            state_dict = torch.load(path)
+            self._model.load_state_dict(state_dict["model"])
+            if "optimizer" in state_dict:
+                self._optimizer.load_state_dict(state_dict["optimizer"])
+            print("Checkpoint loaded!")
 
     @staticmethod
     def _check_and_mkdir(path):
@@ -128,4 +129,5 @@ class Trainer:
 
 
 if __name__ == "__main__":
-    Trainer(Config()).train()
+    from config import ConfigPrecisingNetwork
+    Trainer(ConfigPrecisingNetwork()).train()

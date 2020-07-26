@@ -23,7 +23,7 @@ class FoveaLoader(Dataset):
         self._load_images(config.path)
 
     def _load_annotations(self, path):
-        xlss = glob.glob(osp.join(path, "fovea_" + self._mode.name, "*.xlsx"))
+        xlss = glob.glob(osp.join(path, self._config.subfolder[self._mode], "*.xlsx"))
         for xls in xlss:
             data = pd.read_excel(xls)
             if "ImgName" in self._fovea_gt:
@@ -71,7 +71,7 @@ class FoveaLoader(Dataset):
 def get_data_loader(config, mode):
     dataset = FoveaLoader(config, mode)
     # TODO: finish
-    data_loader = DataLoader(dataset, batch_size=config.batch_size, shuffle=config.shuffle[mode], num_workers=8)
+    data_loader = DataLoader(dataset, batch_size=config.batch_size, shuffle=config.shuffle[mode], num_workers=8, drop_last=True)
     return data_loader
 
 
