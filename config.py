@@ -30,7 +30,7 @@ class Config:
     post_processing_fn = center_of_gravity_postprocess
     limit_size = 0.8
     path_to_checkpoints = "/home/brani/STORAGE/DATA/refugee/checkpoints/fovea"
-    checkpoint_name = "2.30_9.ckpt"
+    checkpoint_name = ""
     subfolder = {
         DataMode.eval: "fovea_eval",
         DataMode.train: "fovea_train"

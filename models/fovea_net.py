@@ -1,12 +1,14 @@
 import torch
 from torch.nn import Conv2d, ConvTranspose2d, BatchNorm2d, ReLU, Sequential
+from torchvision.models.resnet import resnet101
 
 
 class FoveaNet(torch.nn.Module):
 
     def __init__(self, num_classes):
         super().__init__()
-        self.backbone = torch.hub.load('zhanghang1989/ResNeSt', 'resnest50', pretrained=True)
+        # self.backbone = torch.hub.load('zhanghang1989/ResNeSt', 'resnest50', pretrained=True)
+        self.backbone = resnet101(pretrained=True)
         self.backbone.fc = None
         self.decoder4 = _DecoderBlock(*(1024 + 512, 512, 512))
         self.decoder3 = _DecoderBlock(*(1024, 512, 512))

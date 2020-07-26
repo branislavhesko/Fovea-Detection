@@ -130,4 +130,4 @@ class Trainer:
 
 if __name__ == "__main__":
     from config import ConfigPrecisingNetwork
-    Trainer(ConfigPrecisingNetwork()).train()
+    Trainer(Config()).train()
