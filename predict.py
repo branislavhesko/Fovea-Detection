@@ -31,7 +31,7 @@ class FoveaPredictor:
 
     def _preprocess_image(self, image):
         scale_x, scale_y = image.shape[1] / self._config.shape[1], image.shape[0] / self._config.shape[0]
-        image =  cv2.resize(cv2.cvtColor(image, cv2.COLOR_BGR2RGB),
+        image = cv2.resize(cv2.cvtColor(image, cv2.COLOR_BGR2RGB),
                             (self._config.shape[0], self._config.shape[1])) / 255.
         image = torch.from_numpy(image).permute(2, 0, 1).to(self._config.device)
         return image.float().unsqueeze(0), (scale_x, scale_y)
