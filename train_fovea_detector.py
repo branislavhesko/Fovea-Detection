@@ -34,6 +34,7 @@ class Trainer:
         self._load_checkpoint(os.path.join(self._config.path_to_checkpoints, self._config.checkpoint_name))
 
     def train(self):
+        self.validate(-1)
         for epoch in range(self._config.num_epochs):
             self._train_single_epoch(epoch)
             if epoch % self._config.validation_frequency == 0:
@@ -90,18 +91,18 @@ class Trainer:
     @staticmethod
     def _get_progress_plot(img, labels, outputs, batch_idx):
         output_numpy = outputs[batch_idx, 0, :, :].detach().cpu().numpy()
-        fig = plt.figure(1, dpi=100, figsize=(6, 2))
+        labels_numpy = labels[batch_idx, 0, :, :].detach().cpu().numpy()
+        fig = plt.figure(1, dpi=200, figsize=(6, 2))
         plt.subplot(1, 3, 1)
         plt.imshow(cv2.resize(img.detach().permute([0, 2, 3, 1]).cpu().numpy()[batch_idx, :, :, :], output_numpy.shape))
+        plt.plot(np.amax(np.argmax(labels_numpy, axis=1)), np.amax(np.argmax(labels_numpy, axis=0)), "+r",
+                 markersize=15)
         plt.subplot(1, 3, 2)
         plt.imshow(output_numpy, vmin=0, vmax=1)
         plt.plot(*np.unravel_index(np.argmax(output_numpy, axis=None), shape=output_numpy.shape)[::-1], "+r",
                  markersize=15)
         plt.subplot(1, 3, 3)
-        labels_numpy = labels[batch_idx, 0, :, :].detach().cpu().numpy()
         plt.imshow(labels_numpy)
-        plt.plot(np.amax(np.argmax(labels_numpy, axis=1)), np.amax(np.argmax(labels_numpy, axis=0)), "+r",
-                 markersize=15)
         return fig
 
     def _save_checkpoint(self, path, epoch, include_optimizer=True):
@@ -130,4 +131,4 @@ class Trainer:
 
 if __name__ == "__main__":
     from config import ConfigPrecisingNetwork
-    Trainer(Config()).train()
+    Trainer(ConfigPrecisingNetwork()).train()

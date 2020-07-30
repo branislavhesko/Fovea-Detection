@@ -11,8 +11,8 @@ from predict import FoveaPredictor
 
 
 class DatasetGenerator:
-    CROP_SIZE = 256
-    OUTPUT_FOLDER = "/home/brani/STORAGE/DATA/refugee/fovea_centered_dataset/"
+    CROP_SIZE = 128
+    OUTPUT_FOLDER = "/home/brani/STORAGE/DATA/refugee/fovea_centered_dataset_small/"
 
     def __init__(self, config: Config):
         self._predictor = FoveaPredictor(config)

@@ -40,12 +40,12 @@ class FoveaPredictor:
 if __name__ == "__main__":
     import glob
     from matplotlib import pyplot as plt
-    images = glob.glob(os.path.join("/home/brani/STORAGE/DATA/refugee/test/*.jpg"))
+    images = sorted(glob.glob(os.path.join("/home/brani/STORAGE/DATA/refugee/test/*.jpg")))
     predictor = FoveaPredictor(Config())
     predictor_p = FoveaPredictor(ConfigPrecisingNetwork())
     import pandas as pd
     from tqdm import tqdm
-    half_size = 256
+    half_size = 64
     frame = pd.DataFrame(columns=["ImageName", "Fovea_X", "Fovea_Y"])
     # images = ["/home/brani/STORAGE/DATA/refugee/images/n0038.jpg",]
     for img_f in tqdm(images):
@@ -54,16 +54,14 @@ if __name__ == "__main__":
         cropped = img[int(fy) - half_size: int(fy) + half_size, int(fx) - half_size: int(fx) + half_size, :]
         output_p, fyy, fxx = predictor_p.predict(cropped)
         basename = os.path.basename(img_f)
-        if True or abs(fxx - half_size) < 60 and abs(fyy - half_size) < 60:
-            frame = frame.append({"ImageName": basename, "Fovea_X": fx - half_size + fxx, "Fovea_Y": fy - half_size + fyy}, ignore_index=True)
-        else:
-            print("Change is bigger!!")
-            frame = frame.append({"ImageName": basename, "Fovea_X": fx, "Fovea_Y": fy}, ignore_index=True)
-            plt.subplot(1, 2, 1)
-            plt.imshow(img[:, :, ::-1])
-            plt.plot(fx - half_size + fxx, fy - half_size + fyy, "xb", markersize=11)
-            plt.plot(fx, fy, "xg", markersize=11)
-            plt.subplot(1, 2, 2)
-            plt.imshow(output_p)
-            plt.show()
+        #frame = frame.append({"ImageName": basename, "Fovea_X": fx - half_size + fxx, "Fovea_Y": fy - half_size + fyy}, ignore_index=True)
+        frame = frame.append({"ImageName": basename, "Fovea_X": fx, "Fovea_Y": fy}, ignore_index=True)
+        print(f"Image: {img_f}, FX: {fx - half_size + fxx}, FY: {fy - half_size + fyy}")
+        # plt.subplot(1, 2, 1)
+        # plt.imshow(img[:, :, ::-1])
+        # plt.plot(fx - half_size + fxx, fy - half_size + fyy, "xb", markersize=11)
+        # plt.plot(fx, fy, "xg", markersize=11)
+        # plt.subplot(1, 2, 2)
+        # plt.imshow(output_p)
+        # plt.show()
     frame.to_csv("fovea_location_results.csv", sep=",", index=False)

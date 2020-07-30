@@ -1,5 +1,6 @@
 from enum import auto, Enum
 
+from augmentations import Compose, HorizontalFlip, Rotate, VerticalFlip
 from utils.post_processing import max_postprocess, center_of_gravity_postprocess
 
 
@@ -11,7 +12,7 @@ class DataMode(Enum):
 class Config:
 
     num_classes = 1
-    num_epochs = 20
+    num_epochs = 30
     learning_rate = 1e-4
     validation_frequency = 1
     alfa = 2.
@@ -24,29 +25,36 @@ class Config:
         DataMode.eval: 10
     }
     device = "cuda:0"
-    kernel_size = 1
+    kernel_size = 19
     shuffle = {DataMode.train: True, DataMode.eval: False}
     batch_size = 2
     post_processing_fn = center_of_gravity_postprocess
     limit_size = 0.8
     path_to_checkpoints = "/home/brani/STORAGE/DATA/refugee/checkpoints/fovea"
-    checkpoint_name = ""
+    checkpoint_name = "2.51_13.ckpt"
     subfolder = {
         DataMode.eval: "fovea_eval",
         DataMode.train: "fovea_train"
     }
+    def __init__(self):
+        self.augmentations = {
+            DataMode.eval: Compose([]),
+            DataMode.train: Compose([Rotate(10, self.output_stride),
+                                     HorizontalFlip(0.5, self.output_stride),
+                                     VerticalFlip(0.5, self.output_stride)])
+        }
 
 
 class ConfigPrecisingNetwork(Config):
-    shape = (512, 512)
-    batch_size = 2
-    path_to_checkpoints = "/home/brani/STORAGE/DATA/refugee/checkpoints/fovea_precising"
-    path = "/home/brani/STORAGE/DATA/refugee/fovea_centered_dataset/"
+    shape = (256, 256)
+    batch_size = 12
+    path_to_checkpoints = "/home/brani/STORAGE/DATA/refugee/checkpoints/fovea_precising_small"
+    path = "/home/brani/STORAGE/DATA/refugee/fovea_centered_dataset_small"
     subfolder = {
-        DataMode.eval: "fovea_centered_dataset",
-        DataMode.train: "fovea_centered_dataset"
+        DataMode.eval: "fovea_centered_dataset_small",
+        DataMode.train: "fovea_centered_dataset_small"
     }
-    checkpoint_name = "6.67_6.ckpt"
+    checkpoint_name = "6.40_6.ckpt"
     output_stride = 2
-    kernel_size = 1
+    kernel_size = 7
     post_processing_fn = max_postprocess
