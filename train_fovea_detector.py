@@ -10,6 +10,7 @@ from tqdm import tqdm
 from config import Config, DataMode
 from data_loader import get_data_loader
 from focal_loss import TotalLoss
+from models.focal_net import FocalNet
 from models.fovea_net import FoveaNet
 from utils.precision_meter import PrecisionMeter
 
@@ -21,7 +22,7 @@ class Trainer:
                             level=logging.INFO, datefmt='%d/%m/%Y %I:%M:%S')
         self._config = config
         self._model = FoveaNet(num_classes=config.num_classes).to(self._config.device)
-        self._optimizer = torch.optim.Adam(params=self._model.parameters(), lr=1e-4)
+        self._optimizer = torch.optim.AdamW(params=self._model.parameters(), lr=2e-4, weight_decay=1e-4)
         self._logger = logging.getLogger(self.__class__.__name__)
         self._visualizer = SummaryWriter()
         self._data_loader = {DataMode.train: get_data_loader(config, mode=DataMode.train),
@@ -116,7 +117,7 @@ class Trainer:
         torch.save(state_dict, path)
 
     def _load_checkpoint(self, path):
-        if self._config.checkpoint_name:
+        if self._config.checkpoint_name and os.path.exists(path):
             state_dict = torch.load(path)
             self._model.load_state_dict(state_dict["model"])
             if "optimizer" in state_dict:
@@ -130,5 +131,5 @@ class Trainer:
 
 
 if __name__ == "__main__":
-    from config import ConfigPrecisingNetwork
-    Trainer(ConfigPrecisingNetwork()).train()
+    from config import Config
+    Trainer(Config()).train()

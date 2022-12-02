@@ -17,9 +17,9 @@ class Config:
     validation_frequency = 1
     alfa = 2.
     beta = 4.
-    path = "/home/brani/STORAGE/DATA/refugee/"
+    path = "/media/brani/DATA/DATASETS/refugee/"
     shape = (512, 512)
-    output_stride = 2
+    output_stride = 1
     visualization_frequency = {
         DataMode.train: 50,
         DataMode.eval: 10
@@ -31,7 +31,7 @@ class Config:
     post_processing_fn = center_of_gravity_postprocess
     limit_size = 0.8
     path_to_checkpoints = "/home/brani/STORAGE/DATA/refugee/checkpoints/fovea"
-    checkpoint_name = "2.51_13.ckpt"
+    checkpoint_name = ""
     subfolder = {
         DataMode.eval: "fovea_eval",
         DataMode.train: "fovea_train"

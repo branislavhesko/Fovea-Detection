@@ -29,6 +29,7 @@ class FoveaNet(torch.nn.Module):
         dec_3 = self.decoder3(torch.cat([layer2_out, dec_4], dim=1))
         dec_2 = self.decoder2(torch.cat([layer1_out, dec_3], dim=1))
         final = self.final_part(torch.cat([enc1, dec_2], dim=1))
+        final = torch.nn.functional.interpolate(final, size=input_.shape[2:], mode='bilinear', align_corners=True)
         return torch.clamp(final.sigmoid_(), min=1e-4, max=1 - 1e-4)
 
 
