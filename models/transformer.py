@@ -1,3 +1,6 @@
+from math import sqrt
+
+import einops
 import torch
 import torch.nn as nn
 
@@ -12,11 +15,15 @@ class Transformer(nn.Module):
         self.input_query = nn.Embedding(num_output_queries, d_model)
         decoder_layer = nn.TransformerDecoderLayer(d_model, nhead, dim_feedforward, dropout, activation, batch_first=True)
         self.decoder = nn.TransformerDecoder(decoder_layer, num_decoder_layers)
+        self.size = int(sqrt(num_output_queries - 2))
 
     def forward(self, x):
+        x = einops.rearrange(x, "b c h w -> b (h w) c")
         encoder_out = self.encoder(x + self.positional_encoding)
         decoder_out = self.decoder(self.input_query.weight.unsqueeze(0).repeat(encoder_out.shape[0], 1, 1), encoder_out)
-        return decoder_out
+        position_queries = decoder_out[:, :2, :]
+        mask_queries = einops.rearrange(decoder_out[:, 2:, :], "b (h w) d -> b d h w", h=16, w=16)
+        return position_queries, mask_queries
 
 if __name__ == '__main__':
     model = Transformer(
