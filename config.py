@@ -17,7 +17,7 @@ class Config:
     validation_frequency = 1
     alfa = 2.
     beta = 4.
-    path = "/media/brani/DATA/DATASETS/refugee/"
+    path = "/home/brani/DATA/DATASETS/refugee/"
     shape = (512, 512)
     output_stride = 1
     visualization_frequency = {
@@ -30,7 +30,7 @@ class Config:
     batch_size = 2
     post_processing_fn = center_of_gravity_postprocess
     limit_size = 0.8
-    path_to_checkpoints = "/home/brani/STORAGE/DATA/refugee/checkpoints/fovea"
+    path_to_checkpoints = "/home/brani/DATA/DATASETS/refugee/checkpoints/fovea"
     checkpoint_name = ""
     subfolder = {
         DataMode.eval: "fovea_eval",
@@ -48,8 +48,8 @@ class Config:
 class ConfigPrecisingNetwork(Config):
     shape = (256, 256)
     batch_size = 12
-    path_to_checkpoints = "/home/brani/STORAGE/DATA/refugee/checkpoints/fovea_precising_small"
-    path = "/home/brani/STORAGE/DATA/refugee/fovea_centered_dataset_small"
+    path_to_checkpoints = "/home/brani/DATA/DATASETS/refugee/checkpoints/fovea_precising_small"
+    path = "/home/brani/DATA/DATASETS/refugee/fovea_centered_dataset_small"
     subfolder = {
         DataMode.eval: "fovea_centered_dataset_small",
         DataMode.train: "fovea_centered_dataset_small"
