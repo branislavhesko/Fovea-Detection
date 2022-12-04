@@ -21,7 +21,7 @@ class Trainer:
         logging.basicConfig(format='%(levelname)s: [%(asctime)s] [%(name)s:%(lineno)d-%(funcName)20s()] %(message)s',
                             level=logging.INFO, datefmt='%d/%m/%Y %I:%M:%S')
         self._config = config
-        self._model = FoveaNet(num_classes=config.num_classes).to(self._config.device)
+        self._model = FocalNet(num_classes=config.num_classes).to(self._config.device)
         self._optimizer = torch.optim.AdamW(params=self._model.parameters(), lr=2e-4, weight_decay=1e-4)
         self._logger = logging.getLogger(self.__class__.__name__)
         self._visualizer = SummaryWriter()
