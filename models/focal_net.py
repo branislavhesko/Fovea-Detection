@@ -3,7 +3,7 @@ import torch.nn as nn
 
 from models.focal_net_backbone import FocalNet as FocalNetBackbone
 from models.decoder import _CentralPart, _DecoderBlock, _FinalBlock
-from models.transformer import Transformer
+from models.transformer import CoarseTransformer
 
 class FocalNet(nn.Module):
     CHANNELS = [96, 192, 384, 768]
@@ -17,7 +17,7 @@ class FocalNet(nn.Module):
         self.decoder2 = _DecoderBlock(448, 256, 256)
         self.decoder1 = _DecoderBlock(352, 256, 256)
         self.final_block = _FinalBlock(256, num_classes)
-        self.transformer = Transformer(
+        self.transformer = CoarseTransformer(
             num_tokens=16 ** 2,
             num_encoder_layers=4,
             num_decoder_layers=4,
